@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Dashboard</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #1a73e8;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        /* Layout Styles */
+        .layout {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation for Large Screens */
+        nav {
+            background-color: #1a73e8;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        nav ul li {
+            width: 100%;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        nav ul li.active, nav ul li:hover {
+            background-color: #0c47a1;
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .viz-container {
+            width: 100%;
+            height: 80vh;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background-color: white;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 800px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            nav {
+                flex-direction: row;
+                justify-content: center;
+                box-shadow: none;
+                min-width: 100%;
+                padding: 0.5rem 0;
+            }
+
+            nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 5px;
+                padding: 10px 15px;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .viz-container {
+                height: 60vh;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            nav ul li {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .viz-container {
+                height: 50vh;
+            }
+        }
+    </style>
+    <script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.8.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Annual Survey Dashboard</h1>
+    </header>
+    <div class="layout">
+        <nav>
+            <ul id="nav-tabs">
+            </ul>
+        </nav>
+        <main>
+            <div id="tableauViz" class="viz-container"></div>
+        </main>
+    </div>
+    <script>
+        const dashboards = [
+            { job: 'Analyst', url: 'https://public.tableau.com/views/RegionalSampleWorkbook/Storms' },
+            { job: 'Manager', url: 'https://public.tableau.com/views/RegionalSampleWorkbook/Obesity' },
+            { job: 'Engineer', url: 'https://public.tableau.com/views/RegionalSampleWorkbook/College' },
+        ];
+
+        let currentViz;
+        function initViz(dashboardUrl) {
+            const vizContainer = document.getElementById('tableauViz');
+            const vizOptions = {
+                width: vizContainer.offsetWidth + 'px',
+                height: vizContainer.offsetHeight + 'px',
+                hideTabs: true,
+                hideToolbar: true
+            };
+            if (currentViz) {
+                currentViz.dispose();
+            }
+
+            currentViz = new tableau.Viz(vizContainer, dashboardUrl, vizOptions);
+        }
+        function setupTabs() {
+            const navTabs = document.getElementById('nav-tabs');
+            dashboards.forEach((dashboard, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = dashboard.job;
+                listItem.addEventListener('click', () => {
+                    document.querySelectorAll('nav ul li').forEach(li => li.classList.remove('active'));
+                    listItem.classList.add('active');
+                    initViz(dashboard.url);
+                });
+                if (index === 0) {
+                    listItem.classList.add('active');
+                    initViz(dashboard.url); 
+                }
+                navTabs.appendChild(listItem);
+            });
+        }
+        window.addEventListener('resize', () => {
+            if (currentViz) {
+                const vizContainer = document.getElementById('tableauViz');
+                currentViz.setFrameSize(vizContainer.offsetWidth, vizContainer.offsetHeight);
+            }
+        });
+        document.addEventListener('DOMContentLoaded', setupTabs);
+    </script>
+</body>
+</html>
